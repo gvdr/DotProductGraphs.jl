@@ -11,7 +11,12 @@ It should cover all things RDPG, from SVD embeddings of networks, to more advanc
 For now, you can retrieve an embedding of a given size:
 
 ```julia
-Left_embedding, Right_embedding = svd_embedding(A,4) # where A is an adjacency matrix
+# we build a random, silly 1,0 matrix A
+# and think of it as a Graph adjacency matrix
+A = rand(Bool,100,100)
+
+# we build a pair of 4 dimensional embeddings
+Left_embedding, Right_embedding = svd_embedding(A,4)
 ```
 
 And produce a matrix of interaction probability by dot product:
