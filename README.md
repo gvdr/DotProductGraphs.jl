@@ -35,8 +35,11 @@ P = dot_product(Left_embedding, Right_embedding)
     - [x] Automatic block matrix building
     - [ ] Embedding extraction
 - [ ] Implement Procrustes Allignment
-    - [ ] Partial: Just getting the min distances
-    - [ ] Full: Obtaining rotation matrix
+    - [ ] orthogonal
+        - [x] Partial: Just getting the min distances (cheating, as we compute the full rotation matrix)
+        - [x] Full: Obtaining rotation matrix
+    - [ ] allowing translations
+    - [ ] seedless
 - [ ] Elbow and principled method to choose dimensionality
 - [ ] Register package.
 - [ ] Think how to integrate with Graphs.jl and EcologicalNetworks.jl
