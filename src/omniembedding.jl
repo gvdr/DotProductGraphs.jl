@@ -1,3 +1,4 @@
+  # creates an unitialised block matrix of the right size and type
 function initialize_omni(Tₜ::V) where V <: Vector{<:AbstractSparseMatrix}
     T = length(Tₜ)
   
@@ -9,6 +10,7 @@ function initialize_omni(Tₜ::V) where V <: Vector{<:AbstractSparseMatrix}
     return blockmatr
   end
   
+  # creates an unitialised block matrix of the right size and type
   function initialize_omni(Tₜ::V) where V <: Vector{<:Matrix}
     T = length(Tₜ)
   
@@ -19,16 +21,21 @@ function initialize_omni(Tₜ::V) where V <: Vector{<:AbstractSparseMatrix}
     return blockmatr
   end
   
+
+  # fills an unitialised block matrix with the (averaged) matrices from the temporal sequence
   function fill_bm!(blockmatrix, Tₜ)
   
     T = length(Tₜ)
   
+    # TODO we want to eventually allow users to define their own weighting schemes for the omni embedding
     for i in 1:T, j in 1:T
      @inbounds setblock!(blockmatrix, (Tₜ[i] + Tₜ[j])/2, i, j)
     end
   
   end
   
+
+  # transforms a sequence of adjacency matrix into an omni embedding
   function temp_net_to_bm(Tₜ)
   
     bm = initialize_omni(Tₜ)

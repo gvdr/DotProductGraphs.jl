@@ -1,5 +1,6 @@
 using LinearAlgebra
 
+# some rice over LinearAlgebra.svd to return a truncated Singular Value Decomposition
 function truncated_svd(Mat, dim)
 
     L,Σ,Rt = svd(Mat)
