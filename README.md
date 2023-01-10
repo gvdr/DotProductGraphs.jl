@@ -40,3 +40,7 @@ P = dot_product(Left_embedding, Right_embedding)
 - [ ] Elbow and principled method to choose dimensionality
 - [ ] Register package.
 - [ ] Think how to integrate with Graphs.jl and EcologicalNetworks.jl
+
+## Acknowledgement
+
+DotProductGraphs is heavily inspired by [graspologic](https://microsoft.github.io/graspologic), but it focus on being light (focussing on a narrower set of techniques, as we complement wider ecosystems as Graphs.jl and EcologicalNetworks.jl) and squeezing out performance from being written in Julia.
