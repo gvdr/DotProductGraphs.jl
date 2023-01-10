@@ -11,6 +11,9 @@ function truncated_svd(Mat, dim)
   
 end
 
+# computes an svd embedding of a matrix A of size d
+# using the svd engine defined by the user
+# (or the defaulut one from LinearAlgebra)
 function svd_embedding(A,d; svd_engine = nothing)
 
   # by default, we use LinearAlgebra.svd
@@ -26,9 +29,13 @@ function svd_embedding(A,d; svd_engine = nothing)
     return (L̂ = L̂, R̂ = R̂)
 end
 
+# clamps a value x to be in the intervall [0,1]
 clamp_to_prob(x) = x > one(x) ? one(x) :
                    x < zero(x) ? zero(x) : x
 
+
+# computes the dot product between two embeddings
+# and clamps values to be probablities
 function dot_product(L,R; to_prob = true)
 
   (size(L)[2] == size(R)[2]) || error("Embeddings must be of compatible size")
