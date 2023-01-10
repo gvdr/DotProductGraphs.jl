@@ -21,3 +21,14 @@ P = dot_product(Left_embedding, Right_embedding)
 ```
 
 ## TODO
+
+- [ ] Document all the things!
+- [x] Include basic embedding and dot product capability relying on LinearAlgebra
+- [ ] Allow user to choose the svd "engine" (e.g., KrylovKit.JL, Arpack.JL, LowRankApprox.jl, ...) by defining a unified interface
+- [ ] Implement Omniembedding functions
+    - [x] Automatic block matrix building
+    - [ ] Embedding extraction
+- [ ] Implement Procrustes Allignment
+    - [ ] Partial: Just getting the min distances
+    - [ ] Full: Obtaining rotation matrix
+- [ ] Elbow and principled method to choose dimensionality
