@@ -1,3 +1,8 @@
+"""
+    DotProductGraphs
+
+A Julia package for Random Dot Product Graphs.
+"""
 module DotProductGraphs
 
 using BlockArrays
