@@ -33,26 +33,6 @@ function truncated_svd(Mat::T, d::Int) where T <: AbstractMatrix
 end
 
 """
-  func(Arg, Arg)
-
-Short
-
-Long
-
-# Arguments
-* `x1`: what
-* `x2`: what
-
-# Notes
-* note note note
-
-# Examples
-```julia
-julia> 
-```
-"""
-
-"""
   svd_embedding(A,d; svd_engine = nothing)
 
 Computes an SVD embedding of an adjacency matrix `A` of dimension `d`, using `svd_engine` to perform the SVD factorization

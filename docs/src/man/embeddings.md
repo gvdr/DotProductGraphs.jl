@@ -1,18 +1,7 @@
 # The DotProductGraphs Module
 
  ```@docs
- DotProductGraphs
+ truncated_svd
+ svd_embedding
+ dot_product
  ```
-
-## Module Index
-
-```@index
-Modules = [DotProductGraphs]
-Order   = [:constant, :type, :function, :macro]
-```
-## Detailed API
-
-```@autodocs
-Modules = [DotProductGraphs]
-Order   = [:constant, :type, :function, :macro]
-```

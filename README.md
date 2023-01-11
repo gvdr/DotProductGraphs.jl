@@ -1,7 +1,7 @@
 # DotProductGraphs
 
 [![Build Status](https://github.com/gvdr/DotProductGraphs.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/gvdr/DotProductGraphs.jl/actions/workflows/CI.yml?query=branch%3Amain)
-
+[![codecov.io](http://codecov.io/github/sylvaticus/MyAwesomePackage.jl/coverage.svg?branch=main)](http://codecov.io/github/sylvaticus/MyAwesomePackage.jl?branch=main)
 [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://gvdr.github.io/DotProductGraphs.jl/stable)
 [![](https://img.shields.io/badge/docs-dev-blue.svg)](https://gvdr.github.io/DotProductGraphs.jl/dev)
 
