@@ -60,8 +60,8 @@ end
      # and test whether we can get the embeddings right
      # TODO we should think about what to do for non uniqueness
      # (maybe using rotated_ortho_procrustes?)
-     @test L ≈ target_L
-     @test R ≈ target_R
+     @test L ≈ target_L || L ≈ target_L[:,2:1]
+     @test R ≈ target_R || R ≈ target_R[:,2:1]
 end
 
 @testset "dot_product" begin
