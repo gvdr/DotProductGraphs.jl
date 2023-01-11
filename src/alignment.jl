@@ -10,12 +10,18 @@ end
 
 # modifies in place a matrix A, rotating it to minimise the distances to B
 function rotated_ortho_procrustes!(A,B)
-    A .= orthogonal_procrustes_RM(A,B) * A
+    A .= ortho_procrustes_RM(A,B) * A
+end
+
+# Returns a matrix Aᵣ, rotating it to minimise the distances to B
+function rotated_ortho_procrustes(A,B)
+    Aᵣ = ortho_procrustes_RM(A,B) * A
+    return Aᵣ
 end
 
 # compute the minimum distance between any rotated Ω*A and B
 function distance_ortho_procrustes(A,B)
-    Ω = orthogonal_procrustes_RM(A,B)
+    Ω = ortho_procrustes_RM(A,B)
     D = sum(abs2,B - Ω * A)
     return D
 end

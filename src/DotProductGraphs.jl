@@ -12,6 +12,7 @@ export temp_net_to_bm
 include("omniembedding.jl")
 
 export ortho_procrustes_RM
+export rotated_ortho_procrustes
 export rotated_ortho_procrustes!
 export distance_ortho_procrustes
 include("alignment.jl")
