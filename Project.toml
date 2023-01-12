@@ -12,6 +12,7 @@ LowRankApprox = "898213cb-b102-5a47-900c-97e73b919f73"
 SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 
 [compat]
+BlockArrays = "0.16"
 Graphs = "1"
 KrylovKit = "0.6"
 LowRankApprox = "0.5"
