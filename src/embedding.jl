@@ -1,7 +1,7 @@
 using LinearAlgebra
 
 """
-  truncated_svd(Mat, dim)
+  `truncated_svd(Mat, dim)`
 
 Computes a truncated Singular Value Decomposition
 
@@ -33,7 +33,7 @@ function truncated_svd(Mat::T, d::Int) where T <: AbstractMatrix
 end
 
 """
-  svd_embedding(A,d; svd_engine = nothing)
+  `svd_embedding(A,d; svd_engine = nothing)`
 
 Computes an SVD embedding of an adjacency matrix `A` of dimension `d`, using `svd_engine` to perform the SVD factorization
 
@@ -82,7 +82,7 @@ clamp_to_prob(x::Number) = x > one(x) ? one(x) :
 
 
 """
-  dot_product(L,R;to_prob = true)
+  `dot_product(L,R;to_prob = true)`
 
 Computes the dot product between two embeddings and gives back a matrix of interaction probabilities
 
