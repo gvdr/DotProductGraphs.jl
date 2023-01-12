@@ -3,7 +3,8 @@ using DotProductGraphs
 
 push!(LOAD_PATH,"../src/")
 makedocs(sitename="DotProductGraphs.jl",
-    authors = "Giulio Valentino Dalla RIva",
+    authors = "Giulio Valentino Dalla Riva",
+    modules = [DotProductGraphs],
     pages = [
         "Home" => "index.md",
         "Manual" => [
