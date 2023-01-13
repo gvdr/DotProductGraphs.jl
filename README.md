@@ -46,8 +46,9 @@ P = dot_product(Left_embedding, Right_embedding)
         - [x] Full: Obtaining rotation matrix
     - [ ] allowing translations
     - [ ] seedless
-- [ ] Elbow and principled method to choose dimensionality
-- [ ] Register package.
+- [x] Elbow method to choose dimensionality
+    - [ ] hard thresholds?
+- [x] Register package.
 - [ ] Think how to integrate with Graphs.jl and EcologicalNetworks.jl
 
 ## Acknowledgement
