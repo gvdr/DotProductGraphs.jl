@@ -9,7 +9,7 @@ Just some rice over the default LinearAlgebra.svd to return a truncated Singular
 
 # Arguments
 * `Mat`: The matrix we want to factorize
-* `d`: The dimension of the factorization
+* `dim`: If an `Int`, the dimension of the embedding. If it is left to nothing, the function uses Zhu&Ghodsi method to estimate the optimal embedding dimension. Or it can be a user defined function that returns the optimal dimension of the embedding.
 
 # Notes
 * This is in general not efficient, as we are computing first a full factorization and then truncating it. We should consider using more optimized methods.
@@ -22,9 +22,14 @@ julia> # and then decompose it:
 julia> L, Σ, Rt = truncated_svd(block_matrix,2)
 ```
 """
-function truncated_svd(Mat::T, d::Int) where T <: AbstractMatrix
+function truncated_svd(Mat::T, dim::O = nothing) where {T <: AbstractMatrix, O <: Union{Nothing,<:Int,Function}}
 
     L,Σ,Rt = svd(Mat)
+
+    d = isnothing(dim) ? d_elbow(Σ) :
+        isinteger(dim) ? dim :
+        dim(Mat)
+
     L = L[:,1:d]
     Σ = Σ[1:d]
     Rt = Rt[:,1:d]
@@ -43,7 +48,7 @@ In that case, `svd_engine` must be a function of the same form of `truncated_svd
 
 # Arguments
 * `A`: Adjacency matrix of the graph to embed.
-* `d`: Dimension of the embedding
+* `d`: If an `Int`, the dimension of the embedding. If it is left to nothing, the function uses Zhu&Ghodsi method to estimate the optimal embedding dimension. Or it can be a user defined function that returns the optimal dimension of the embedding.
 * `svd_engine`: The function used to perform the SVD factorization, by default `svd()` from `LinearAlgebra`
 
 # Notes
@@ -53,11 +58,14 @@ In that case, `svd_engine` must be a function of the same form of `truncated_svd
 ```julia
 julia> # we first build a 2 blocks matrix:
 julia> block_matrix = reshape([ones(5,5) zeros(5,5); zeros(5,5) ones(5,5)],10,10)
-julia> # and then decompose it:
-julia> L,R = svd_embedding(block_matrix,2)
+julia> # and then decompose it by specifying a dimensionality
+julia> L,R = svd_embedding(block_matrix,4)
+julia> # or automatically
+julia> L,R = svd_embedding(block_matrix)
+
 ```
 """
-function svd_embedding(A::T,d::Int,svd_engine::F) where {T <: AbstractMatrix, F<:Function}
+function svd_embedding(A::T,d::O = nothing,svd_engine::F) where {T <: AbstractMatrix, F<:Function, O <: Union{Nothing,<:Int,Function}}
 
     # decompose A in d dimensions
     L,Σ,R = svd_engine(A,d)
@@ -69,14 +77,18 @@ function svd_embedding(A::T,d::Int,svd_engine::F) where {T <: AbstractMatrix, F<
     return (L̂ = L̂, R̂ = R̂)
 end
 
-# if no function is specified, use `truncated_svd`
-function svd_embedding(A::T,d::Int) where T <: AbstractMatrix
+"""
+  if no function for the `svd_engine` is specified, use `truncated_svd`
+"""
+function svd_embedding(A::T,d::O = nothing) where {T <: AbstractMatrix, O <: Union{Nothing,<:Int,Function}}
     return svd_embedding(A,d,truncated_svd) 
 end
 
 
 
-# clamps a value x to be in the intervall [0,1]
+"""
+  clamps a value x to be in the intervall [0,1]
+"""
 clamp_to_prob(x::Number) = x > one(x) ? one(x) :
                    x < zero(x) ? zero(x) : x
 
@@ -98,7 +110,7 @@ The left and right embeddings must be of the same dimension (e.g., `size(L)[2] =
 julia> # we first build a 2 blocks matrix:
 julia> block_matrix = reshape([ones(5,5) zeros(5,5); zeros(5,5) ones(5,5)],10,10)
 julia> # and then decompose it:
-julia> L,R = svd_embedding(block_matrix,2)
+julia> L,R = svd_embedding(block_matrix,2) # or, automatically L,R = svd_embedding(block_matrix)
 julia> dot_product(L,R) ≈ block_matrix
 ```
 """

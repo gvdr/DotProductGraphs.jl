@@ -19,6 +19,10 @@ A = rand(Bool,100,100)
 
 # we build a pair of 4 dimensional embeddings
 Left_embedding, Right_embedding = svd_embedding(A,4)
+
+# or we can let the function identify automatically the optimal embedding dimension
+
+Left_optimal, Right_optimal = svd_embedding(A)
 ```
 
 And produce a matrix of interaction probability by dot product:

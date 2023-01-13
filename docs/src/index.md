@@ -30,6 +30,8 @@ And produce a matrix of interaction probability by dot product:
 P = dot_product(Left_embedding, Right_embedding)
 ```
 
+Details in [Functions](man/Functions)
+
 ## TODO
 
 - [ ] Document all the things!

@@ -8,7 +8,7 @@ makedocs(sitename="DotProductGraphs.jl",
     pages = [
         "Home" => "index.md",
         "Manual" => [
-        "man/embeddings.md",
+        "man/Functions.md",
 #        "man/dimensionality.md",
 #        "man/alignments.md",
 #        "man/omniembedding.md"
