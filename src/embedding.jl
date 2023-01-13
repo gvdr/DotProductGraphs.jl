@@ -38,7 +38,7 @@ function truncated_svd(Mat::T, dim::O = nothing) where {T <: AbstractMatrix, O <
 end
 
 """
-  `svd_embedding(A,d; svd_engine = nothing)`
+  `svd_embedding(A,svd_engine,d)`
 
 Computes an SVD embedding of an adjacency matrix `A` of dimension `d`, using `svd_engine` to perform the SVD factorization
 
@@ -65,7 +65,7 @@ julia> L,R = svd_embedding(block_matrix)
 
 ```
 """
-function svd_embedding(A::T,d::O = nothing,svd_engine::F) where {T <: AbstractMatrix, F<:Function, O <: Union{Nothing,<:Int,Function}}
+function svd_embedding(A::T,svd_engine::F,d::O = nothing) where {T <: AbstractMatrix, F<:Function, O <: Union{Nothing,<:Int,Function}}
 
     # decompose A in d dimensions
     L,Σ,R = svd_engine(A,d)
@@ -81,7 +81,7 @@ end
   if no function for the `svd_engine` is specified, use `truncated_svd`
 """
 function svd_embedding(A::T,d::O = nothing) where {T <: AbstractMatrix, O <: Union{Nothing,<:Int,Function}}
-    return svd_embedding(A,d,truncated_svd) 
+    return svd_embedding(A,truncated_svd,d) 
 end
 
 
