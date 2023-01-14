@@ -15,6 +15,7 @@ StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 
 [compat]
 BlockArrays = "0.16"
+Distributions = "0.25"
 Graphs = "1"
 KrylovKit = "0.6"
 LowRankApprox = "0.5"
