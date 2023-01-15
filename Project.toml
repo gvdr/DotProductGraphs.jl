@@ -1,7 +1,7 @@
 name = "DotProductGraphs"
 uuid = "586abeb4-6645-4f28-8984-da840f878f37"
 authors = ["Giulio Valentino Dalla Riva"]
-version = "0.1.0"
+version = "0.1.1"
 
 [deps]
 BlockArrays = "8e7c35d0-a365-5155-bbbb-fb81a777f24e"
