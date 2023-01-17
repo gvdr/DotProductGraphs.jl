@@ -17,7 +17,7 @@ function d_elbow(Σ::V) where V <: Vector{<:Real}
         μ₁ = mean(Σ[1:d])
         μ₂ = mean(Σ[d+1:end])
         σ = √(( sum(abs2,Σ[1:d] .- μ₁) + sum(abs2,Σ[d+1:end] .- μ₂) ) / (N-2))
-        ll[d] = sum(logpdf.(Normal(μ₁,σ),Σ[1:10])) + sum(logpdf.(Normal(μ₂,σ),Σ[11:20]))
+        ll[d] = sum(logpdf.(Normal(μ₁,σ),Σ[1:d])) + sum(logpdf.(Normal(μ₂,σ),Σ[d+1:end]))
     end
 
     return argmax(ll)
