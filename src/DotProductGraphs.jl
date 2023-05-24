@@ -10,7 +10,7 @@ using SparseArrays
 using LinearAlgebra
 using Distributions
 using StatsBase
-
+using Arpack
 export svd_embedding
 export dot_product
 include("embedding.jl")
@@ -27,5 +27,12 @@ export rotated_ortho_procrustes!
 export distance_ortho_procrustes
 include("alignment.jl")
 
+export constructRDPG
+include("constructRDPG.jl")
 
+export TemporalNetworkEmbedding
+include("TemporalNetworkEmbedding.jl")
+
+export nearestNeighbours
+include("nearestNeighbours.jl")
 end

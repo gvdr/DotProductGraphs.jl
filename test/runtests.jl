@@ -71,3 +71,46 @@ end
 
     @test dot_product(L,R) ≈ blocks2
 end
+
+@testset "TemporalNetworkEmbedding" begin
+    TemporalNetworkEmbedding([], [], 0, 0)
+end
+
+
+@testset "constructRDPG" begin
+    A = [[1 1 1;
+          1 1 1;
+          1 1 1],
+         [1 1 0;
+          1 1 0;
+          1 1 0]]
+    T = TemporalNetworkEmbedding(A,2)
+    @test A ≈ constructRDPG(T)
+end
+
+@testset "constructRDPG" begin
+    A = [[1 1 1;
+          1 1 1;
+          1 1 1],
+         [1 1 0;
+          1 1 0;
+          1 0 0]]
+    T = TemporalNetworkEmbedding(A,2)
+    u = [0 1]'
+    @test [3] == nearestNeighbours(u, 2, T, 1)
+end
+
+
+@testset "Base.getindex" begin
+    A = [[1 1 1;
+          1 1 1;
+          1 1 1],
+         [1 1 0;
+          1 1 0;
+          1 0 0]]
+    T = TemporalNetworkEmbedding(A,2)
+
+    @test T[1.0] == T[1,:AL]
+    @test T[1.9999] ≈ T[2,:AL]
+    @test T[1.4] ≈ 0.6*T[1,:AL]+0.4*T[2,:AL]
+end
