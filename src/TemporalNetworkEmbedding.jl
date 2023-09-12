@@ -1,4 +1,3 @@
-using Arpack
 import Base: getindex, lastindex, length, iterate
 
 """
