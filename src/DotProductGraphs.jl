@@ -32,6 +32,7 @@ export constructRDPG
 include("constructRDPG.jl")
 
 export TemporalNetworkEmbedding
+export embed_temporalnetwork
 include("TemporalNetworkEmbedding.jl")
 
 export nearestNeighbours
