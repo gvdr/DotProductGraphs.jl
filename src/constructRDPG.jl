@@ -1,10 +1,6 @@
-using LinearAlgebra
 """
 Constructs RDPG from TemporalNetworkEmbedding; if tsteps is false, the whole time series reconstruction will be returned
 """
-
-include("TemporalNetworkEmbedding.jl")
-
 
 function constructRDPG(TempNet::TemporalNetworkEmbedding; tsteps=false)
     # p ∈ s, n, t
