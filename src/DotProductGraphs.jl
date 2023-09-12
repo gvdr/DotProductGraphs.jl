@@ -16,6 +16,7 @@ export dot_product
 include("embedding.jl")
 
 export temp_net_to_bm
+export aveMat_unsafe
 include("omniembedding.jl")
 
 export d_elbow
