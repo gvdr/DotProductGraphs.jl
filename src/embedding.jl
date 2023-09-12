@@ -1,5 +1,3 @@
-using LinearAlgebra
-
 """
   `truncated_svd(Mat, dim)`
 

@@ -1,19 +1,4 @@
-
-using Arpack
-"""
-    TemporalNetworkEmbedding
-    A: The raw embedding array dims = [d*n, :]
-    n: The number of nodes in the network
-    d: The dimension of the embedding
-
-"""
-
-struct TemporalNetworkEmbedding
-    AL::AbstractArray
-    AR::AbstractArray
-    n::Int
-    d::Int
-end
+import Base: getindex, lastindex, length, iterate
 
 @inline function Base.getindex(X::TemporalNetworkEmbedding, t::T, side::Symbol=:AL) where {T<:AbstractFloat} 
     X[Int(floor(t))][side]*(1-(t-floor(t))).+X[Int(ceil(t))][side]*(t-floor(t)) # uses linear interpolation between indices
@@ -37,6 +22,7 @@ Base.length(X::TemporalNetworkEmbedding) = size(X.AL)[3]
 
 Base.iterate(X::TemporalNetworkEmbedding)= [X[i] for i in 1:length(X)]
 
+# This is a constructor for the class TemporalNetworkEmbedding
 function TemporalNetworkEmbedding(TempNet::AbstractVector{T}, d::Int) where T<:AbstractArray
 
 

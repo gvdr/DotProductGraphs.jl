@@ -35,16 +35,16 @@ end
 """
   # fills an unitialised block matrix with the (averaged) matrices from the temporal sequence
 """
-function fill_bm!(blockmatrix, Tₜ)
-
-	T = length(Tₜ)
-
-	# TODO we want to eventually allow users to define their own weighting schemes for the omni embedding
-	for i in 1:T, j in 1:T
-		@inbounds setblock!(blockmatrix, (Tₜ[i] + Tₜ[j]) / 2, i, j)
-	end
-
-end
+#function fill_bm!(blockmatrix, Tₜ)
+#
+#	T = length(Tₜ)
+#
+#	# TODO we want to eventually allow users to define their own weighting schemes for the omni embedding
+#	for i in 1:T, j in 1:T
+#		@inbounds setblock!(blockmatrix, (Tₜ[i] + Tₜ[j]) / 2, i, j)
+#	end
+#
+#end
 
 """
   entrywise average of two matrices `weight(Tᵢ,Tⱼ,i,j) = (Tᵢ + Tⱼ)/2`).
@@ -58,7 +58,7 @@ end
   `weight(Tᵢ::M,T::Mⱼ,i::Int,j::Int) where M <: AbstractMatrix` defines how to aggregate the matrices of indeces `i` and `j`
   (for example, in the default function `weight(Tᵢ,Tⱼ,i,j) = (Tᵢ + Tⱼ)/2`).
 """
-function fill_bm!(blockmatrix, Tₜ; weight::Function = aveMat_unsafe)
+function fill_bm!(blockmatrix, Tₜ, weight::Function = aveMat_unsafe)
 
 	T = length(Tₜ)
 
