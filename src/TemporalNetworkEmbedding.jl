@@ -37,7 +37,7 @@ Base.length(X::TemporalNetworkEmbedding) = size(X.AL)[3]
 
 Base.iterate(X::TemporalNetworkEmbedding)= [X[i] for i in 1:length(X)]
 
-function TemporalNetworkEmbedding(TempNet::AbstractVector{T}, d::Int) where T<:AbstractArray
+function embed_temporalnetwork(TempNet::AbstractVector{T}, d::Int) where T<:AbstractArray
 
 
     n = size(TempNet[1])[1]
