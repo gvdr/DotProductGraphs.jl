@@ -58,7 +58,7 @@ end
   `weight(Tᵢ::M,T::Mⱼ,i::Int,j::Int) where M <: AbstractMatrix` defines how to aggregate the matrices of indeces `i` and `j`
   (for example, in the default function `weight(Tᵢ,Tⱼ,i,j) = (Tᵢ + Tⱼ)/2`).
 """
-function fill_bm!(blockmatrix, Tₜ; weight::Function = aveMat_unsafe)
+function fill_bm!(blockmatrix, Tₜ, weight::Function = aveMat_unsafe)
 
 	T = length(Tₜ)
 
