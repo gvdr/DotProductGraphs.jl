@@ -11,6 +11,21 @@ using LinearAlgebra
 using Distributions
 using StatsBase
 using Arpack
+
+"""
+    TemporalNetworkEmbedding
+    A: The raw embedding array dims = [d*n, :]
+    n: The number of nodes in the network
+    d: The dimension of the embedding
+
+"""
+struct TemporalNetworkEmbedding
+    AL::AbstractArray
+    AR::AbstractArray
+    n::Int
+    d::Int
+end
+
 export svd_embedding
 export dot_product
 include("embedding.jl")
