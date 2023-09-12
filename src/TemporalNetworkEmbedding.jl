@@ -1,5 +1,6 @@
-
 using Arpack
+import Base: getindex, lastindex, length, iterate
+
 """
     TemporalNetworkEmbedding
     A: The raw embedding array dims = [d*n, :]
@@ -37,7 +38,8 @@ Base.length(X::TemporalNetworkEmbedding) = size(X.AL)[3]
 
 Base.iterate(X::TemporalNetworkEmbedding)= [X[i] for i in 1:length(X)]
 
-function embed_temporalnetwork(TempNet::AbstractVector{T}, d::Int) where T<:AbstractArray
+# This is a constructor for the class TemporalNetworkEmbedding
+function TemporalNetworkEmbedding(TempNet::AbstractVector{T}, d::Int) where T<:AbstractArray
 
 
     n = size(TempNet[1])[1]
