@@ -6,6 +6,7 @@ A Julia package for Random Dot Product Graphs.
 module DotProductGraphs
 
 using BlockArrays
+using BlockArrays: Block, mortar, undef_blocks
 using SparseArrays
 using LinearAlgebra
 using Distributions
@@ -32,7 +33,14 @@ include("embedding.jl")
 
 export temp_net_to_bm
 export aveMat_unsafe
+export omni_embedding
+export omni_extract
 include("omniembedding.jl")
+
+export uase_embedding
+export duase_embedding
+export mase_embedding
+include("multigraph_embedding.jl")
 
 export d_elbow
 include("dimensionality.jl")

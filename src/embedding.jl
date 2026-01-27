@@ -68,9 +68,10 @@ function svd_embedding(A::T,svd_engine::F,d::O = nothing) where {T <: AbstractMa
     # decompose A in d dimensions
     L,Σ,R = svd_engine(A,d)
 
-    # Obtain embeddings
-    L̂ = L * diagm(.√Σ)
-    R̂ = R * diagm(.√Σ)
+    # Obtain embeddings (use Diagonal for efficiency - avoids allocating full matrix)
+    sqrt_Σ = sqrt.(Σ)
+    L̂ = L .* sqrt_Σ'
+    R̂ = R .* sqrt_Σ'
     
     return (L̂ = L̂, R̂ = R̂)
 end

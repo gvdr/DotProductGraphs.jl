@@ -1,18 +1,20 @@
 """
-Constructs RDPG from TemporalNetworkEmbedding; if tsteps is false, the whole time series reconstruction will be returned
-"""
+    constructRDPG(TempNet::TemporalNetworkEmbedding; tsteps=false)
 
+Reconstructs adjacency matrices from a TemporalNetworkEmbedding.
+
+# Arguments
+* `TempNet`: The temporal network embedding
+* `tsteps`: Time steps to reconstruct (default: all time steps)
+
+# Returns
+Vector of reconstructed adjacency matrices (one per time step)
+"""
 function constructRDPG(TempNet::TemporalNetworkEmbedding; tsteps=false)
-    # p ∈ s, n, t
-    # pR' = a
-    # round(a)
-    if typeof(tsteps)==Bool
+    if tsteps === false
         tsteps = 1:length(TempNet)
     end
 
-
-    Ls = [TempNet[t][:AL] for t in tsteps]
-    Rs = [TempNet[t][:AR]' for t in tsteps]
-
-    rdpg = Ls.*Rs
+    # Matrix multiplication L * R' for each time step
+    return [TempNet[t][:AL] * TempNet[t][:AR]' for t in tsteps]
 end

@@ -12,12 +12,24 @@ function d_elbow(Σ::V) where V <: Vector{<:Real}
 
     N = length(Σ)
 
-    ll = Array{Float64, 1}(undef, N-1)
-    for d in 1:(N-1)
-        μ₁ = mean(Σ[1:d])
-        μ₂ = mean(Σ[d+1:end])
-        σ = √(( sum(abs2,Σ[1:d] .- μ₁) + sum(abs2,Σ[d+1:end] .- μ₂) ) / (N-2))
-        ll[d] = sum(logpdf.(Normal(μ₁,σ),Σ[1:d])) + sum(logpdf.(Normal(μ₂,σ),Σ[d+1:end]))
+    ll = Vector{Float64}(undef, N-1)
+    @inbounds for d in 1:(N-1)
+        # Use views to avoid allocations
+        Σ_left = @view Σ[1:d]
+        Σ_right = @view Σ[d+1:end]
+
+        μ₁ = mean(Σ_left)
+        μ₂ = mean(Σ_right)
+
+        # Compute variance terms without intermediate allocations
+        ss_left = sum(x -> abs2(x - μ₁), Σ_left)
+        ss_right = sum(x -> abs2(x - μ₂), Σ_right)
+        σ = sqrt((ss_left + ss_right) / (N-2))
+
+        # Compute log-likelihood directly
+        dist₁ = Normal(μ₁, σ)
+        dist₂ = Normal(μ₂, σ)
+        ll[d] = sum(x -> logpdf(dist₁, x), Σ_left) + sum(x -> logpdf(dist₂, x), Σ_right)
     end
 
     return argmax(ll)
