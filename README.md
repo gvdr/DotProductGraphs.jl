@@ -8,7 +8,7 @@ A Julia package for Random Dot Product Graphs (RDPG).
 
 It covers SVD-based embeddings of networks, multiple multi-graph embedding methods for temporal networks, Procrustes alignment, and automatic dimensionality selection.
 
-**Requires Julia 1.9+**
+**Requires Julia 1.6+**
 
 ## Installation
 
@@ -39,7 +39,7 @@ P = dot_product(L, R)
 
 ## Multi-Graph Embedding Methods
 
-DotProductGraphs provides four methods for embedding temporal/multi-layer networks:
+DotProductGraphs provides five methods for embedding temporal/multi-layer networks:
 
 | Method | Function | Reference |
 |--------|----------|-----------|
@@ -47,6 +47,7 @@ DotProductGraphs provides four methods for embedding temporal/multi-layer networ
 | **UASE** | `uase_embedding` | Gallagher et al. (2021) |
 | **DUASE** | `duase_embedding` | Baum et al. (2024) |
 | **MASE** | `mase_embedding` | Arroyo et al. (2021) |
+| **GB-DASE** | `gbdase` | Loyal (2025) |
 
 ### Quick Example
 
@@ -71,6 +72,15 @@ result = duase_embedding(A, 4)
 # MASE - Two-stage SVD for common latent positions
 result = mase_embedding(A, 4; return_scores=true)
 # result.V is common embedding (n x d), result.scores are per-graph score matrices
+
+# GB-DASE - Bayesian Gibbs sampler with random walk prior
+result = gbdase(A, 4; rw_order=2, n_burnin=500, n_samples=1000)
+# result.X is (T x n x d), smoothed by penalizing acceleration (r=2)
+# result.samples contains posterior samples for uncertainty quantification
+
+# GB-DASE MAP estimation (faster, no uncertainty)
+result = gbdase_MAP(A, 4; rw_order=2)
+# result.X is (T x n x d)
 ```
 
 ### TemporalNetworkEmbedding
@@ -101,6 +111,7 @@ A_reconstructed = constructRDPG(T)
 - **UASE**: Gallagher et al. (2021) "Spectral embedding for dynamic networks with stability guarantees" NeurIPS
 - **DUASE**: Baum, Sanna Passino & Gandy (2024) "Doubly unfolded adjacency spectral embedding" arXiv:2410.09810
 - **MASE**: Arroyo et al. (2021) "Inference for multiple heterogeneous networks" JMLR
+- **GB-DASE**: Loyal (2025) "Generalized Bayesian Dynamic Adjacency Spectral Embedding" [arXiv:2509.19748](https://arxiv.org/abs/2509.19748)
 
 ## TODO
 
@@ -111,7 +122,7 @@ A_reconstructed = constructRDPG(T)
 - [x] Implement Omniembedding functions
     - [x] Automatic block matrix building
     - [x] Embedding extraction
-- [x] Implement multi-graph embedding methods (UASE, DUASE, MASE)
+- [x] Implement multi-graph embedding methods (UASE, DUASE, MASE, GB-DASE)
 - [x] Implement Procrustes Alignment
     - [x] Orthogonal rotation matrix
     - [ ] Allowing translations

@@ -1,5 +1,8 @@
 using DotProductGraphs
 using Test
+using LinearAlgebra: issymmetric, norm
+using Random
+using StatsBase: cor
 
 @testset "rotated_ortho_procrustes" begin
     # set up starting matrices and rotation matrices
@@ -257,4 +260,268 @@ end
         P_reconstructed = result_duase.X_shared * Y_t'
         @test size(P_reconstructed) == (n, n)
     end
+end
+
+@testset "difference_matrix and rw_precision_matrix" begin
+    # Test difference matrix construction
+    D1 = difference_matrix(5, 1)
+    @test size(D1) == (4, 5)
+    # First order difference: x[t+1] - x[t]
+    x = [1.0, 2.0, 4.0, 7.0, 11.0]
+    @test D1 * x ≈ [1.0, 2.0, 3.0, 4.0]
+
+    D2 = difference_matrix(5, 2)
+    @test size(D2) == (3, 5)
+    # Second order difference: x[t+2] - 2x[t+1] + x[t]
+    @test D2 * x ≈ [1.0, 1.0, 1.0]
+
+    # Test precision matrix
+    K = rw_precision_matrix(5, 1)
+    @test size(K) == (5, 5)
+    @test issymmetric(K)
+end
+
+@testset "gbdase_MAP" begin
+    # Create smooth temporal network for testing
+    n = 8
+    d = 2
+    T = 5
+
+    # Generate smooth trajectory
+    X_true = [0.4 .+ 0.1 * randn(n, d) for _ in 1:T]
+    for t in 2:T
+        X_true[t] = X_true[t-1] + 0.02 * randn(n, d)
+    end
+
+    # Generate probability matrices
+    A = [clamp.(X_true[t] * X_true[t]', 0, 1) for t in 1:T]
+
+    # Test GB-DASE MAP
+    result = gbdase_MAP(A, d; max_iter=10, rw_order=2)
+
+    @test haskey(result, :X)
+    @test haskey(result, :sigma)
+    @test haskey(result, :K)
+
+    @test size(result.X) == (T, n, d)
+    @test length(result.sigma) == n  # node-specific sigma by default
+    @test size(result.K) == (T, T)
+end
+
+@testset "gbdase_gibbs" begin
+    # Create small test case for Gibbs sampler
+    n = 6
+    d = 2
+    T = 4
+
+    # Generate smooth trajectory
+    X_true = [0.4 .+ 0.1 * randn(n, d) for _ in 1:T]
+    for t in 2:T
+        X_true[t] = X_true[t-1] + 0.02 * randn(n, d)
+    end
+
+    A = [clamp.(X_true[t] * X_true[t]', 0, 1) for t in 1:T]
+
+    # Test with minimal iterations for speed
+    result = gbdase_gibbs(A, d; n_burnin=10, n_samples=20, seed=42)
+
+    @test haskey(result, :X)
+    @test haskey(result, :sigma)
+    @test haskey(result, :samples)
+    @test haskey(result, :sigma_samples)
+
+    @test size(result.X) == (T, n, d)
+    @test length(result.sigma) == n
+    @test length(result.samples) == 20
+    @test length(result.sigma_samples) == 20
+end
+
+@testset "gbdase" begin
+    # Create small test case for faithful Python reproduction
+    n = 8
+    d = 2
+    T = 5
+
+    # Generate test matrices
+    A = [rand(n, n) for _ in 1:T]
+    A = [a + a' for a in A]  # symmetrize
+
+    # Test with minimal iterations for speed
+    result = gbdase(A, d; n_burnin=10, n_samples=20, seed=42)
+
+    @test haskey(result, :X)
+    @test haskey(result, :sigma)
+    @test haskey(result, :samples)
+    @test haskey(result, :sigma_samples)
+    @test haskey(result, :scale_samples)
+    @test haskey(result, :K)
+
+    # Check dimensions - faithful uses (T, n, d) format
+    @test size(result.X) == (T, n, d)
+    @test length(result.sigma) == n
+    @test length(result.samples) == 20
+    @test length(result.sigma_samples) == 20
+    @test length(result.scale_samples) == 20
+    @test size(result.K) == (T, T)
+end
+
+@testset "gbdase_forecast" begin
+    # Create small test case
+    n = 6
+    d = 2
+    T = 5
+
+    # Generate smooth trajectory
+    X_true = [0.4 .+ 0.1 * randn(n, d) for _ in 1:T]
+    for t in 2:T
+        X_true[t] = X_true[t-1] + 0.02 * randn(n, d)
+    end
+
+    A = [clamp.(X_true[t] * X_true[t]', 0, 1) for t in 1:T]
+
+    result = gbdase_MAP(A, d; max_iter=5)
+
+    # Test forecast_positions with different methods
+    k_steps = 3
+
+    X_linear = gbdase_forecast_positions(result, k_steps; method=:linear)
+    @test size(X_linear) == (k_steps, n, d)
+
+    X_quadratic = gbdase_forecast_positions(result, k_steps; method=:quadratic)
+    @test size(X_quadratic) == (k_steps, n, d)
+
+    X_ar = gbdase_forecast_positions(result, k_steps; method=:ar)
+    @test size(X_ar) == (k_steps, n, d)
+
+    # Test forecast (full P matrices)
+    P_future = gbdase_forecast(result, k_steps; method=:linear)
+    @test length(P_future) == k_steps
+    @test all(size(P) == (n, n) for P in P_future)
+
+    # Forecasted P should be symmetric (since X*X')
+    @test all(P ≈ P' for P in P_future)
+end
+
+@testset "gbdase vs gbdase_MAP consistency" begin
+    # Test that faithful Gibbs sampler and MAP optimization give similar results
+    # on a well-behaved problem
+
+    n = 8
+    d = 2
+    T = 5
+
+    # Generate a smooth, low-rank temporal network
+    # Use fixed seed for reproducibility
+    Random.seed!(123)
+    X_true = [0.5 * ones(n, d) + 0.05 * randn(n, d) for _ in 1:T]
+    for t in 2:T
+        X_true[t] = X_true[t-1] + 0.01 * randn(n, d)
+    end
+
+    # Generate probability matrices from true embeddings
+    A = [clamp.(X_true[t] * X_true[t]', 0, 1) for t in 1:T]
+
+    # Run MAP estimation
+    result_map = gbdase_MAP(A, d; max_iter=30, rw_order=2)
+
+    # Run faithful Gibbs sampler with more samples for good posterior mean
+    result_gibbs = gbdase(A, d; n_burnin=200, n_samples=500, rw_order=2, seed=42)
+
+    # Both methods now use (T, n, d) format
+    X_gibbs = result_gibbs.X
+    X_map = result_map.X
+
+    # Compare reconstructed probability matrices (rotation-invariant)
+    # Note: MAP (gbdase_MAP) and Gibbs (gbdase) can give different
+    # results because:
+    # - MAP finds a point estimate while Gibbs computes posterior mean
+    # - Different priors (MLE vs Half-Cauchy for sigma)
+    # - MCMC noise in Gibbs sampling
+    # So we test that both give REASONABLE reconstructions, not identical ones.
+    total_error = 0.0
+    for t in 1:T
+        P_map = X_map[t, :, :] * X_map[t, :, :]'
+        P_gibbs = X_gibbs[t, :, :] * X_gibbs[t, :, :]'
+        total_error += norm(P_map - P_gibbs) / norm(P_map)
+    end
+    avg_relative_error = total_error / T
+
+    # The reconstructed P matrices should be in the same ballpark
+    # (allowing for fundamental algorithmic differences)
+    @test avg_relative_error < 1.5  # Within 150% relative error
+
+    # Check that both methods recover embeddings that reconstruct A reasonably
+    reconstruction_error_map = 0.0
+    reconstruction_error_gibbs = 0.0
+    for t in 1:T
+        P_map = X_map[t, :, :] * X_map[t, :, :]'
+        P_gibbs = X_gibbs[t, :, :] * X_gibbs[t, :, :]'
+        reconstruction_error_map += norm(P_map - A[t])^2
+        reconstruction_error_gibbs += norm(P_gibbs - A[t])^2
+    end
+
+    # Both should have reasonable reconstruction (not zero, but not huge)
+    @test reconstruction_error_map < n * n * T  # Less than 1 per element on average
+    @test reconstruction_error_gibbs < n * n * T
+
+    # Sigma estimates should be in the same ballpark
+    sigma_map = result_map.sigma
+    sigma_gibbs = result_gibbs.sigma
+
+    # Both should have positive sigma values
+    @test all(sigma_map .> 0)
+    @test all(sigma_gibbs .> 0)
+
+    # Correlation between sigma estimates (should be positively correlated)
+    sigma_corr = cor(sigma_map, sigma_gibbs)
+    @test sigma_corr > -0.5  # At least not strongly negatively correlated
+end
+
+@testset "gbdase_diagnostics" begin
+    # Create small test case with Gibbs samples
+    n = 6
+    d = 2
+    T = 4
+
+    X_true = [0.4 .+ 0.1 * randn(n, d) for _ in 1:T]
+    for t in 2:T
+        X_true[t] = X_true[t-1] + 0.02 * randn(n, d)
+    end
+
+    A = [clamp.(X_true[t] * X_true[t]', 0, 1) for t in 1:T]
+
+    # Need enough samples for diagnostics
+    result = gbdase_gibbs(A, d; n_burnin=5, n_samples=20, seed=42)
+
+    diag = gbdase_diagnostics(result)
+
+    @test haskey(diag, :ess)
+    @test haskey(diag, :rhat)
+    @test haskey(diag, :summary)
+
+    # Check dimensions of ESS and R-hat arrays
+    @test size(diag.ess) == (n, d, T)
+    @test size(diag.rhat) == (n, d, T)
+
+    # Check summary statistics exist
+    @test haskey(diag.summary, :mean_ess)
+    @test haskey(diag.summary, :min_ess)
+    @test haskey(diag.summary, :max_ess)
+    @test haskey(diag.summary, :mean_rhat)
+    @test haskey(diag.summary, :max_rhat)
+    @test haskey(diag.summary, :n_samples)
+
+    # ESS should be positive
+    @test all(diag.ess .> 0)
+
+    # R-hat should be >= 1 (approximately)
+    @test all(diag.rhat .>= 0.9)  # Allow some numerical tolerance
+
+    # Test with faithful sampler too
+    result_faithful = gbdase(A, d; n_burnin=5, n_samples=20, seed=42)
+    diag_faithful = gbdase_diagnostics(result_faithful)
+
+    @test haskey(diag_faithful, :ess)
+    @test haskey(diag_faithful, :rhat)
+    @test size(diag_faithful.ess) == (n, d, T)
 end

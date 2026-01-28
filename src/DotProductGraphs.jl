@@ -12,6 +12,9 @@ using LinearAlgebra
 using Distributions
 using StatsBase
 using Arpack
+using Random
+using BandedMatrices
+using Optim
 
 """
     TemporalNetworkEmbedding
@@ -41,6 +44,17 @@ export uase_embedding
 export duase_embedding
 export mase_embedding
 include("multigraph_embedding.jl")
+
+export gbdase
+export gbdase_MAP
+export gbdase_gibbs
+export difference_matrix
+export rw_precision_matrix
+export gbdase_forecast
+export gbdase_forecast_positions
+export gbdase_diagnostics
+include("gbdase_embedding.jl")
+include("gbdase_faithful.jl")
 
 export d_elbow
 include("dimensionality.jl")
