@@ -55,8 +55,14 @@ DotProductGraphs provides five methods for embedding temporal/multi-layer networ
 using DotProductGraphs
 
 # Create temporal network (list of adjacency matrices)
-A = [rand(50, 50) for _ in 1:10]
-A = [a + a' for a in A]  # symmetrize
+# Here we simulate a network with slowly evolving latent positions
+n, d, T = 50, 4, 10
+X = [0.3 * randn(n, d) for _ in 1:T]
+for t in 2:T
+    X[t] = X[t-1] + 0.05 * randn(n, d)  # smooth evolution
+end
+A = [Float64.(rand(n, n) .< clamp.(X[t] * X[t]', 0, 1)) for t in 1:T]
+A = [(a + transpose(a)) / 2 for a in A]  # symmetrize
 
 # Omnibus embedding - block matrix with averaged off-diagonals
 result = omni_embedding(A, 4)
@@ -78,7 +84,7 @@ result = gbdase(A, 4; rw_order=2, n_burnin=500, n_samples=1000)
 # result.X is (T x n x d), smoothed by penalizing acceleration (r=2)
 # result.samples contains posterior samples for uncertainty quantification
 
-# GB-DASE MAP estimation (faster, no uncertainty)
+# GB-DASE MAP estimation (no uncertainty quantification)
 result = gbdase_MAP(A, 4; rw_order=2)
 # result.X is (T x n x d)
 ```
